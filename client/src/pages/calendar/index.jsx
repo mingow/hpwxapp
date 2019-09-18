@@ -23,6 +23,41 @@ export default class ViewPage extends Taro.Component {
     navigationBarTitleText: '场地预定'
   }
 
+  constructor(props){
+    super(props);
+    wx.cloud.init();
+  }
+
+  generateQrcode(){
+    wx.cloud.callFunction({
+      name:'generateAppQrcodeWithparams',
+      data:{},
+      success: res => {
+        if(!res.result.errCode){
+          var fsm = wx.getFileSystemManager();
+          let base64Data = wx.arrayBufferToBase64(res.result.buffer.data);
+          console.log(base64Data);
+
+          fsm.writeFile({
+            filePath: wx.env.USER_DATA_PATH + '/test.png',
+            data: base64Data,     //去除base64头部格式文字,我使用的是'data:image/png;base64', jpeg的话是slice(23)
+            encoding: 'base64',
+            success: res => {
+              let nimgs = wx.env.USER_DATA_PATH + '/test.png';
+              console.log(nimgs);
+            },
+            fail: err => {
+              rej(err)
+            }
+          })
+
+        }
+
+      }
+    })
+
+  }
+
   handleCheckboxChange (value) {
     this.setState({
       checkedList: value
@@ -84,7 +119,7 @@ export default class ViewPage extends Taro.Component {
           </View>
         </AtCard>
 
-        <AtButton className='margin-20' type='primary'>预定</AtButton>
+        <AtButton onClick={this.generateQrcode} className='margin-20' type='primary'>预定</AtButton>
       </View>
     )
   }
