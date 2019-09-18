@@ -1,0 +1,14 @@
+{
+  "miniprogramRoot": "./dist",
+  "projectname": "wxapp01",
+  "description": "homeparty",
+  "appid": "wxf5d215ac1ad09a41",
+  "appsecret":"78348a332e161861a89d884802bbee60",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}
