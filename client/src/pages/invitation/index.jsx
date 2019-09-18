@@ -21,8 +21,13 @@ export default class Invitation extends Taro.Component {
         console.log(res);
         if(!res.result.errCode){
           var fsm = wx.getFileSystemManager();
-          let base64Data = wx.arrayBufferToBase64(res.result.buffer.data);
-          console.log(base64Data);
+          var data = '';
+          if(res.result.buffer instanceof ArrayBuffer){
+            data = new Uint8Array(res.result.buffer);
+          }else{
+            data = res.result.buffer.data;
+          }
+          let base64Data = wx.arrayBufferToBase64(data);
 
           fsm.writeFile({
             filePath: wx.env.USER_DATA_PATH + '/test.png',
@@ -30,31 +35,27 @@ export default class Invitation extends Taro.Component {
             encoding: 'base64',
             success: res => {
               let nimgs = wx.env.USER_DATA_PATH + '/test.png';
-              console.log(wx.env);
+              let qrPath = `${wx.env.USER_DATA_PATH}/qr_share.png`;
+              // wx.downloadFile({
+              //   url:nimgs,
+              //   filePath:qrPath,
+              //   success: res => {
+              //     console.log(res);
+              //   }
+              // })
 
+
+              console.log(nimgs);
               wx.getImageInfo({
                 src: nimgs,
                 success (res) {
-                  const ctx = wx.createCanvasContext('canvas')
                   console.log(res.path);
-                  ctx.setStrokeStyle("#00ff00")
-                  ctx.setLineWidth(5)
-                  ctx.rect(0, 0, 200, 200)
-                  ctx.stroke()
-                  ctx.setStrokeStyle("#ff0000")
-                  ctx.setLineWidth(2)
-                  ctx.moveTo(160, 100)
-                  ctx.arc(100, 100, 60, 0, 2 * Math.PI, true)
-                  ctx.moveTo(140, 100)
-                  ctx.arc(100, 100, 40, 0, Math.PI, false)
-                  ctx.moveTo(85, 80)
-                  ctx.arc(80, 80, 5, 0, 2 * Math.PI, true)
-                  ctx.moveTo(125, 80)
-                  ctx.arc(120, 80, 5, 0, 2 * Math.PI, true)
-                  ctx.stroke()
-                  //ctx.draw()
-                  ctx.drawImage(res.path, 0, 0, 360, 360);
+                  const ctx = wx.createCanvasContext('canvas')
+                  ctx.drawImage(res.path, 0, 0, 240, 240);
                   ctx.draw();
+                },
+                fail:err => {
+                  console.log(err);
                 }
               })
 
@@ -64,7 +65,7 @@ export default class Invitation extends Taro.Component {
 
             },
             fail: err => {
-              rej(err)
+              console.log(err);
             }
           })
         }
@@ -77,7 +78,21 @@ export default class Invitation extends Taro.Component {
 
   }
 
-
+  action () {
+    let nimgs = wx.env.USER_DATA_PATH + '/test.png';
+    wx.getImageInfo({
+      src: nimgs,
+      success (res) {
+        const ctx = wx.createCanvasContext('canvas')
+        console.log(res.path);
+        ctx.drawImage(res.path, 0, 0, 360, 360);
+        ctx.draw();
+      },
+      fail:err => {
+        console.log(err);
+      }
+    })
+  }
 
   componentWillMount () {
     var own = this;
@@ -95,7 +110,11 @@ export default class Invitation extends Taro.Component {
 
   render () {
     return (
-      <canvas style={this.state.context} canvas-id="canvas"></canvas>
+      <View>
+        <canvas style={this.state.context} canvas-id="canvas"></canvas>
+        <AtButton onClick={this.action} className='margin-20' type='primary'>预定</AtButton>
+      </View>
+
     )
   }
 
