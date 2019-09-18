@@ -30,7 +30,7 @@ export default class ViewPage extends Taro.Component {
 
   generateQrcode(){
     wx.cloud.callFunction({
-      name:'generateAppQrcodeWithparams',
+      name:'generateAppQrcodeWithParams',
       data:{},
       success: res => {
         if(!res.result.errCode){

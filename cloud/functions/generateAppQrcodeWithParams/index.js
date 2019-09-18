@@ -13,7 +13,8 @@ exports.main = async () => {
 
   try {
     const result = await cloud.openapi.wxacode.getUnlimited({
-        scene: 'a=1'
+        scene: 'a=1',
+        is_hyaline:true
       })
     //console.log(result)
     return result
