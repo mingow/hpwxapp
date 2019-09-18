@@ -17,6 +17,7 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/calendar/index',
+      'pages/invitation/index',
       'pages/map/index'
     ],
     "permission": {
