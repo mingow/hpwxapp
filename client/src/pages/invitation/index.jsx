@@ -3,17 +3,29 @@ import { AtCalendar,AtCard,AtCheckbox,AtButton } from "taro-ui"
 import { View, Text,Picker } from '@tarojs/components'
 import './index.scss'
 
+import shareBG from '../../assets/images/shareBG.jpg'
+
 export default class Invitation extends Taro.Component {
 
   constructor(props){
     super(props);
     this.state = {
       height: 500,
+      width:300,
       context:''
     };
   }
 
   generateQrcode(){
+
+    const ctx = wx.createCanvasContext('canvas')
+    const imageRadio = 1;
+    const width = this.state.width;
+
+    ctx.drawImage(shareBG, 0, 0, this.state.width, this.state.width*imageRadio);
+    // ctx.draw();
+    // ctx.save();
+
     wx.cloud.callFunction({
       name:'generateAppQrcodeWithParams',
       data:{},
@@ -35,23 +47,16 @@ export default class Invitation extends Taro.Component {
             encoding: 'base64',
             success: res => {
               let nimgs = wx.env.USER_DATA_PATH + '/test.png';
-              let qrPath = `${wx.env.USER_DATA_PATH}/qr_share.png`;
-              // wx.downloadFile({
-              //   url:nimgs,
-              //   filePath:qrPath,
-              //   success: res => {
-              //     console.log(res);
-              //   }
-              // })
-
 
               console.log(nimgs);
+
               wx.getImageInfo({
                 src: nimgs,
                 success (res) {
                   console.log(res.path);
-                  const ctx = wx.createCanvasContext('canvas')
-                  ctx.drawImage(res.path, 0, 0, 240, 240);
+                  //const ctx = wx.createCanvasContext('canvas')
+                  const codeWidth = 120;
+                  ctx.drawImage(res.path, 50*width/800, (800-50)*width/800-codeWidth, codeWidth, codeWidth);
                   ctx.draw();
                 },
                 fail:err => {
@@ -59,10 +64,20 @@ export default class Invitation extends Taro.Component {
                 }
               })
 
-              // const ctx = wx.createCanvasContext('canvas')
-              // ctx.drawImage(nimgs, 340 * 0.5 - 46, 400 * 0.15, 105, 105)
-              // ctx.draw()
+              console.log(shareBG);
 
+
+
+              // wx.getImageInfo({
+              //   src: shareBG,
+              //   success (res) {
+              //     console.log(res.path);
+              //
+              //   },
+              //   fail:err => {
+              //     console.log(err);
+              //   }
+              // })
             },
             fail: err => {
               console.log(err);
@@ -96,12 +111,14 @@ export default class Invitation extends Taro.Component {
 
   componentWillMount () {
     var own = this;
+    //获取用户授权，获知用户的id
 
     wx.getSystemInfo({
       success:function(o){
         console.log(o);
         own.setState({
           height:o.windowHeight,
+          width:o.windowWidth,
           context:'width:100%;height:'+o.windowHeight+'px'
         })
       }
@@ -112,7 +129,6 @@ export default class Invitation extends Taro.Component {
     return (
       <View>
         <canvas style={this.state.context} canvas-id="canvas"></canvas>
-        <AtButton onClick={this.action} className='margin-20' type='primary'>预定</AtButton>
       </View>
 
     )
