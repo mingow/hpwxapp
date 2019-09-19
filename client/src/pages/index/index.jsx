@@ -5,11 +5,18 @@ import WmCard from '../components/card'
 import './index.scss'
 //@import "~taro-ui/dist/style/components/flex.scss";
 
-import { AtButton,AtTabBar,AtGrid,AtFab,AtIcon,AtCard } from 'taro-ui'
+import { AtButton,AtTabBar,AtGrid,AtFab,AtIcon,AtCard,AtToast } from 'taro-ui'
 
 import curtainPng from '../../assets/images/swiper-0.jpg'
 
 export default class Index extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      isLoading:false
+    };
+  }
 
   config = {
     navigationBarTitleText: '范屋轰趴馆',
@@ -33,9 +40,12 @@ export default class Index extends Component {
   componentDidHide () { }
 
   action = e => {
+    this.setState({isLoading:true});
+    var own = this;
     wx.getLocation({//获取当前经纬度
       type: 'wgs84', //返回可以用于wx.openLocation的经纬度，官方提示bug: iOS 6.3.30 type 参数不生效，只会返回 wgs84 类型的坐标信息
       success: function (res) {
+        own.setState({isLoading:false});
         wx.openLocation({//​使用微信内置地图查看位置。
           latitude: 22.625197,//要去的纬度-地址
           longitude: 114.067365,//要去的经度-地址
@@ -50,6 +60,7 @@ export default class Index extends Component {
   render () {
     return (
       <View className='index'>
+        <AtToast isOpened={this.state.isLoading} text='疯狂加载中' status='loading'></AtToast>
         <View className='swiper'>
           <Swiper
             className='test-h swiper-item'

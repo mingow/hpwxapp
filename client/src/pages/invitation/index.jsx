@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import { AtCalendar,AtCard,AtCheckbox,AtButton } from "taro-ui"
+import { AtCalendar,AtCard,AtCheckbox,AtButton,AtToast } from "taro-ui"
 import { View, Text,Picker } from '@tarojs/components'
 import './index.scss'
 
@@ -12,7 +12,8 @@ export default class Invitation extends Taro.Component {
     this.state = {
       height: 500,
       width:300,
-      context:''
+      context:'',
+      isLoading:true
     };
   }
 
@@ -21,6 +22,7 @@ export default class Invitation extends Taro.Component {
     const ctx = wx.createCanvasContext('canvas')
     const imageRadio = 1;
     const width = this.state.width;
+    const own = this;
 
     ctx.drawImage(shareBG, 0, 0, this.state.width, this.state.width*imageRadio);
     // ctx.draw();
@@ -58,6 +60,7 @@ export default class Invitation extends Taro.Component {
                   const codeWidth = 120;
                   ctx.drawImage(res.path, 50*width/800, (800-50)*width/800-codeWidth, codeWidth, codeWidth);
                   ctx.draw();
+                  own.setState({isLoading:false});
                 },
                 fail:err => {
                   console.log(err);
@@ -129,6 +132,7 @@ export default class Invitation extends Taro.Component {
     return (
       <View>
         <canvas style={this.state.context} canvas-id="canvas"></canvas>
+        <AtToast isOpened={this.state.isLoading} text='疯狂加载中' status='loading'></AtToast>
       </View>
 
     )
