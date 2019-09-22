@@ -1,9 +1,9 @@
 import Taro from '@tarojs/taro'
-import { AtCalendar,AtCard,AtCheckbox,AtButton,AtToast } from "taro-ui"
+import { AtCalendar,AtCard,AtCheckbox,AtButton,AtToast,AtAvatar } from "taro-ui"
 import { View, Text,Picker } from '@tarojs/components'
 import './index.scss'
 
-import shareBG from '../../assets/images/shareBG.jpg'
+import shareBG from '../../assets/images/shareBG.png'
 
 export default class Invitation extends Taro.Component {
 
@@ -13,15 +13,26 @@ export default class Invitation extends Taro.Component {
       height: 500,
       width:300,
       context:'',
-      isLoading:true
+      isLoading:true,
+      avatar:'',
+      radio:4/3
     };
+  }
+
+  initShareBG(ctx) {
+
+  }
+
+  getUserInfo(e) {
+    console.log(e);
   }
 
   generateQrcode(){
 
     const ctx = wx.createCanvasContext('canvas')
-    const imageRadio = 1;
+    const imageRadio = 4/3;
     const width = this.state.width;
+    const scale = this.state.width/600;
     const own = this;
 
     ctx.drawImage(shareBG, 0, 0, this.state.width, this.state.width*imageRadio);
@@ -57,10 +68,32 @@ export default class Invitation extends Taro.Component {
                 success (res) {
                   console.log(res.path);
                   //const ctx = wx.createCanvasContext('canvas')
-                  const codeWidth = 120;
-                  ctx.drawImage(res.path, 50*width/800, (800-50)*width/800-codeWidth, codeWidth, codeWidth);
-                  ctx.draw();
-                  own.setState({isLoading:false});
+                  const codeWidth = 160;
+                  ctx.drawImage(res.path, 50*scale, scale*700-codeWidth, codeWidth, codeWidth);
+
+                  wx.getUserInfo({
+                    success: function(res) {
+                      var userInfo = res.userInfo
+                      //console.log(avatarUrl);
+                      wx.getImageInfo({
+                        src: userInfo.avatarUrl,
+                        success (res) {
+                          const codeWidth = 100;
+                          ctx.save(); // 先保存状态 已便于画完圆再用
+                          ctx.beginPath(); //开始绘制
+                          ctx.arc(600*scale/2, 140*scale, 50, 0, Math.PI * 2, false);
+                          ctx.clip();
+                          ctx.drawImage(res.path, 600*scale/2-codeWidth/2, scale*140-codeWidth/2, codeWidth, codeWidth);
+                          ctx.restore();
+                          ctx.draw();
+                          own.setState({isLoading:false});
+                        },
+                        fail:err => {
+                          console.log(err);
+                        }
+                      })
+                    }
+                  })
                 },
                 fail:err => {
                   console.log(err);
@@ -112,6 +145,21 @@ export default class Invitation extends Taro.Component {
     })
   }
 
+  savePhoto(){
+    wx.canvasToTempFilePath({
+      canvasId: 'canvas',
+      success(res) {
+        console.log(res.tempFilePath);
+        wx.saveImageToPhotosAlbum({
+          filePath:res.tempFilePath,
+          success:function(){
+
+          }
+        })
+      }
+    })
+  }
+
   componentWillMount () {
     var own = this;
     //获取用户授权，获知用户的id
@@ -122,16 +170,22 @@ export default class Invitation extends Taro.Component {
         own.setState({
           height:o.windowHeight,
           width:o.windowWidth,
-          context:'width:100%;height:'+o.windowHeight+'px'
+          context:'width:100%;height:'+o.windowWidth*own.state.radio+'px',
+          avatar:''
         })
       }
-    })
+    });
   }
 
   render () {
     return (
       <View>
-        <canvas style={this.state.context} canvas-id="canvas"></canvas>
+        <canvas style={this.state.context} canvas-id="canvas">
+        </canvas>
+        <View className='padding25'>
+          <AtButton type='primary' onClick={this.savePhoto}>保存到相册</AtButton>
+        </View>
+
         <AtToast isOpened={this.state.isLoading} text='疯狂加载中' status='loading'></AtToast>
       </View>
 
