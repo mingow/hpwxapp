@@ -113,7 +113,7 @@ export default class Index extends Component {
                 <GridItem icon='dizhi' size='28' color='#000' title='导航' event={this.action} ></GridItem>
               </View>
               <View className='at-col'>
-                <GridItem icon='yaoqing' size='28' color='#000' title='邀请' navigateTo='/pages/invitation/index' ></GridItem>
+                <GridItem icon='yaoqing' size='28' color='#000' badge='返现' title='邀请' navigateTo='/pages/invitation/index' ></GridItem>
               </View>
             </View>
           </View>
