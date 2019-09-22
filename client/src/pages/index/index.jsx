@@ -39,6 +39,15 @@ export default class Index extends Component {
 
   componentDidHide () { }
 
+  makePhoneCall () {
+    wx.makePhoneCall({
+      phoneNumber: '1340000', //仅为示例，并非真实的电话号码
+      fail: function () {
+
+      }
+    })
+  }
+
   action = e => {
     this.setState({isLoading:true});
     var own = this;
@@ -153,6 +162,14 @@ export default class Index extends Component {
 
           />
         </View>
+        <View className='floatButton'>
+          <AtFab onClick={this.makePhoneCall}>
+            <AtIcon prefixClass='icon' value='tel-fill' color='black' size='28'></AtIcon>
+
+          </AtFab>
+          <Text className='floatText'>联系管家</Text>
+        </View>
+
 
 
       </View>
